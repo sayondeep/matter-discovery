@@ -40,7 +40,7 @@ async def main(code):
                                 print(f"{GREEN}Discriminator Matched!{RESET}")
                                 print(f"{GREEN}THE DEVICE IS IN COMMISSIONABLE MODE.{RESET}")
 
-                                exit()
+                                return
                             discriminator_value = int(decoded_values.get("Short Discriminator"), 16)
                             if(short_disc == discriminator_value):
                                 for key, value in decoded_values.items():
@@ -48,7 +48,7 @@ async def main(code):
                                 print(f"{GREEN}Discriminator Matched!{RESET}")
                                 print(f"{GREEN}THE DEVICE IS IN COMMISSIONABLE MODE.{RESET}")
 
-                                exit()
+                                return
                             else:
                                 for key, value in decoded_values.items():
                                     print(f"{key}: {value}")
@@ -57,9 +57,17 @@ async def main(code):
                         except ValueError as e:
                             print(f"Error decoding service data: {e}")
 
+async def run_with_timeout(code, timeout):
+    try:
+        await asyncio.wait_for(main(code), timeout)
+    except asyncio.TimeoutError:
+        print(f"{RED}Program timed out after {timeout} seconds.{RESET}")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scan for BLE devices and decode service data.")
     parser.add_argument("code", type=str, help="The QR/manual code payload to be parsed.")
+    parser.add_argument("--timeout", type=int, default=30, help="Timeout for the program in seconds.")
     args = parser.parse_args()
 
-    asyncio.run(main(args.code))
+    asyncio.run(run_with_timeout(args.code, args.timeout))
+
