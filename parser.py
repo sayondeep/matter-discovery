@@ -13,6 +13,8 @@ def parse_hex(hex_string):
     ad_version_discriminator = (byte_data[1] | (byte_data[2] << 8))
     advertisement_version = ad_version_discriminator & 0xF000
     discriminator = ad_version_discriminator & 0x0FFF
+    short_discriminator = (discriminator >> 8) & 0xF
+
     # Vendor ID and Product ID
     vendor_id = (byte_data[3] | (byte_data[4] << 8))
     product_id = (byte_data[5] | (byte_data[6] << 8))
@@ -28,6 +30,7 @@ def parse_hex(hex_string):
         "Matter BLE OpCode": hex(op_code),
         "Advertisement version": hex(advertisement_version),
         "Discriminator": hex(discriminator),
+        "Short Discriminator": hex(short_discriminator),
         "Vendor ID": hex(vendor_id),
         "Product ID": hex(product_id),
         "Additional Data Flag": additional_data_flag,

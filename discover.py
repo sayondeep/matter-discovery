@@ -20,7 +20,8 @@ async def main(code):
         setup_payload.p_print()
         vid = setup_payload.vid
         pid = setup_payload.pid
-        disc = setup_payload.long_discriminator
+        long_disc = setup_payload.long_discriminator
+        short_disc = setup_payload.short_discriminator
         print(f"\nFinding Matter Commissionable devices ...")
         async for bd, ad in scanner.advertisement_data():
             # Check if service_data is present
@@ -33,10 +34,18 @@ async def main(code):
                         try:
                             decoded_values = parse_hex(hex_string)
                             discriminator_value = int(decoded_values.get("Discriminator"), 16)
-                            if(disc == discriminator_value):
-                                print(f"{GREEN}Discriminator Matched!{RESET}")
+                            if(long_disc == discriminator_value):
                                 for key, value in decoded_values.items():
                                     print(f"{key}: {value}")
+                                print(f"{GREEN}Discriminator Matched!{RESET}")
+                                print(f"{GREEN}THE DEVICE IS IN COMMISSIONABLE MODE.{RESET}")
+
+                                exit()
+                            discriminator_value = int(decoded_values.get("Short Discriminator"), 16)
+                            if(short_disc == discriminator_value):
+                                for key, value in decoded_values.items():
+                                    print(f"{key}: {value}")
+                                print(f"{GREEN}Discriminator Matched!{RESET}")
                                 print(f"{GREEN}THE DEVICE IS IN COMMISSIONABLE MODE.{RESET}")
 
                                 exit()
@@ -50,7 +59,7 @@ async def main(code):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Scan for BLE devices and decode service data.")
-    parser.add_argument("code", type=str, help="The QR code payload to be parsed.")
+    parser.add_argument("code", type=str, help="The QR/manual code payload to be parsed.")
     args = parser.parse_args()
 
     asyncio.run(main(args.code))
